@@ -1,0 +1,118 @@
+---
+# tasks file for bootstrap
+- stat: path=/tmp/partitioning_finished
+  register: partitioning
+  tags:
+  - disk
+
+- include: partitioning.yml
+  when: partitioning.stat.exists == False
+  tags:
+  - disk
+
+- file:
+    path: /tmp/partitioning_finished
+    state: touch
+  when: partitioning.stat.exists == False
+  tags:
+    - disk  
+
+- stat: path=/tmp/formating_finished
+  register: formating
+  tags:
+  - filesystem
+
+- include: formating.yml
+  when: formating.stat.exists == False
+  tags:
+  - filesystem
+
+- file:
+    path: /tmp/formating_finished
+    state: touch
+  tags:
+  - filesystem
+
+- stat: path=/mnt/boot
+  register: mounted
+  tags:
+  - mount
+  - install
+  - configure
+
+- name: mount filesystems
+  command: "{{ item }}"
+  when: mounted.stat.exists == False
+  with_items:
+    - mount "{{ lvm.vg.system.lv.root.dev }}" /mnt
+    - mkdir -p /mnt/boot
+    - mkdir -p /mnt/home
+    - mount "{{ part.2.dev }}" /mnt/boot
+  tags:
+    - mount
+
+- name: check if installed
+  stat: path=/mnt/bin/bash
+  register: packages
+  tags:
+    - install
+    - configure
+
+- name: install base packages
+  command: pacstrap /mnt base f2fs-tools grub openssh python2
+  when: packages.stat.exists == False
+  tags:
+    - install
+
+- stat: path=/tmp/configuration_finished
+  register: config
+  tags:
+  - configure
+
+- include: configure.yml
+  when: config.stat.exists == False
+  tags:
+  - configure
+
+- file:
+    path: /tmp/configuration_finished
+    state: touch
+  tags:
+  - configure
+
+- stat: path=/tmp/chroot_config_finished
+  register: chroot_install
+  tags:
+    - chroot
+
+- name: run commands in chroot
+  command: "arch-chroot /mnt {{ item }}"
+  with_items:
+    - ln -s /usr/share/zoneinfo/{{ locale.region }}/{{ locale.city }} /etc/localtime
+    - grub-install --target=i386-pc "{{ disk }}"
+    - grub-mkconfig -o /boot/grub/grub.cfg
+    - mkinitcpio -p linux
+    - locale-gen
+    - systemctl enable dhcpcd
+    - systemctl enable sshd
+    - bash -c 'source /etc/profile; echo "root:{{ root_password }}" | /usr/sbin/chpasswd'
+    - bash -c 'echo "PermitRootLogin yes" >> /etc/ssh/sshd_config'
+  when: chroot_install.stat.exists == False
+  tags:
+    - chroot
+
+- name: unmount filesystems
+  command: "umount {{ item }}"
+  with_items:
+    - /mnt/boot
+    - /mnt
+  when: chroot_install.stat.exists == False
+  tags:
+    - chroot
+
+- file:
+    path: /tmp/chroot_config_finished
+    state: touch
+  when: chroot_install.stat.exists == False
+  tags:
+    - chroot

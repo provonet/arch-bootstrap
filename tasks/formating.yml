@@ -1,0 +1,18 @@
+# Format partitions
+- name: install f2fs-tools
+  pacman:
+    name: f2fs-tools
+
+- name: format boot
+  command: "mkfs -t {{ part.2.fstype }} {{ part.2.dev }}"
+
+- name: format root
+  command: "mkfs -t {{ lvm.vg.system.lv.root.fstype }} {{ lvm.vg.system.lv.root.dev }}"
+
+- name: format swap
+  command: "{{ item }}"
+  with_items:
+    - mkswap "{{ lvm.vg.system.lv.swap.dev }}"
+
+- name: format home
+  command: "mkfs -t {{ lvm.vg.data.lv.home.fstype }} {{ lvm.vg.data.lv.home.dev }}"

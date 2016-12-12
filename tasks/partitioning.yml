@@ -1,0 +1,52 @@
+# Partitioning
+- name: make partition label
+  command: "parted -s {{ disk }} mklabel gpt"
+
+- name: create grub bios partition
+  command: "parted -s {{ disk }} -- mkpart primary 1 {{ part.1.size }}"
+
+- name: set grub bios
+  command: "parted -s {{ disk }} -- set 1 {{ part.1.type }} on"
+
+- name: create boot partition
+  command: "parted -s {{ disk }} -- mkpart primary {{ part.1.size }} {{ part.2.size }}"
+
+- name: create system disk
+  command: "parted -s {{ disk }} -- mkpart primary {{ part.2.size }} {{ part.3.size }}"
+
+- name: set partition type
+  command: "parted -s {{ disk }} -- set 3 {{ part.3.type }} on"
+
+- name: create data disk
+  command: "parted -s {{ disk }} -- mkpart primary {{ part.3.size }} {{ part.4.size }}"
+
+- name: set partition type
+  command: "parted -s {{ disk }} -- set 4 {{ part.4.type }} on"
+
+- name: create volume group system
+  lvg:
+    vg: "{{ lvm.vg.system.name }}"
+    pvs: "{{ lvm.vg.system.dev }}"
+
+- name: create volume group data
+  lvg:
+    vg: "{{ lvm.vg.data.name }}"
+    pvs: "{{ lvm.vg.data.dev }}"
+
+- name: create logical volume swap
+  lvol:
+    vg: "{{ lvm.vg.system.name }}"
+    lv: "{{ lvm.vg.system.lv.swap.name }}"
+    size: "{{ lvm.vg.system.lv.swap.size }}"
+
+- name: create logical volume root
+  lvol:
+    vg: "{{ lvm.vg.system.name }}"
+    lv: "{{ lvm.vg.system.lv.root.name }}"
+    size: "{{ lvm.vg.system.lv.root.size }}"
+
+- name: create logical volume home
+  lvol:
+    vg: "{{ lvm.vg.data.name }}"
+    lv: "{{ lvm.vg.data.lv.home.name }}"
+    size: "{{ lvm.vg.data.lv.home.size }}"
