@@ -13,54 +13,61 @@ You can tune the installation by overwriting the defauls the role variables in y
 Role Variables
 --------------
 <pre><code>
-    disk: /dev/sda
-    part:
-      1:
-        size: 2
-        type: bios_grub
-      2:
-        size: 300MiB
-        fstype: ext4
-        dev: "{{ disk }}2"
-      3:
-        size: 25GiB
-        type: lvm
-        dev: "{{ disk }}3"
-      4:
-        size: -1
-        type: lvm
-        dev: "{{ disk }}4"
-    lvm:
-      vg:
-        system:
-          name: system
-          dev: "{{ disk }}3"
-          lv:
-            swap:
-              name: swap
-              size: 8g
-              fstype: swap
-              dev: /dev/mapper/system-swap
-            root:
-              name: root
-              size: +100%FREE
-              fstype: f2fs
-              dev: /dev/mapper/system-root
-        data:
-          name: data
-          dev: "{{ disk }}4"
-          lv:
-            home:
-              name: home
-              size: +100%FREE
-              fstype: f2fs
-              dev: /dev/mapper/data-home
+hostname: NOTSET
+domain: NOTSET
+root_password: root
+locale:
+  region: Europe
+  city: Amsterdam
+disk: /dev/sda
+part:
+  1:
+    size: 2
+    type: bios_grub
+  2:
+    size: 300MiB
+    fstype: ext4
+    dev: "{{ disk }}2"
+  3:
+    size: 25GiB
+    type: lvm
+    dev: "{{ disk }}3"
+  4:
+    size: -1
+    type: lvm
+    dev: "{{ disk }}4"
+lvm:
+  vg:
+    system:
+      name: system
+      dev: "{{ disk }}3"
+      lv:
+        swap:
+          name: swap
+          size: 8g
+          fstype: swap
+          dev: /dev/mapper/system-swap
+        root:
+          name: root
+          size: +100%FREE
+          fstype: f2fs
+          dev: /dev/mapper/system-root
+    data:
+      name: data
+      dev: "{{ disk }}4"
+      lv:
+        home:
+          name: home
+          size: +100%FREE
+          fstype: f2fs
+          dev: /dev/mapper/data-home
 </code></pre>
 
 Example Playbook
 ----------------
 <pre><code>
-- hosts: newserver
+- hosts: all
+
   vars:
     hostname: archbox
     domain: mydomain.org
@@ -68,8 +75,17 @@ Example Playbook
     locale:
       region: Europe
       city: Amsterdam
-      roles:
-         - arch-bootstrap
+
+  pre_tasks:
+    - name: clean roles directory
+      local_action: file path=roles state=absent
+
+    - name: run galaxy
+      local_action: command ansible-galaxy install -r requirements.yml --roles-path roles
+
+  roles:
+    - arch-bootstrap
+
 </code></pre>
 
 License
