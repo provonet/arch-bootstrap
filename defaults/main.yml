@@ -1,2 +1,50 @@
 ---
 # defaults file for bootstrap
+hostname: NOTSET
+domain: NOTSET
+root_password: root
+locale:
+  region: Europe
+  city: Amsterdam
+disk: /dev/sda
+part:
+  1:
+    size: 2
+    type: bios_grub
+  2:
+    size: 300MiB
+    fstype: ext4
+    dev: "{{ disk }}2"
+  3:
+    size: 25GiB
+    type: lvm
+    dev: "{{ disk }}3"
+  4:
+    size: -1
+    type: lvm
+    dev: "{{ disk }}4"
+lvm:
+  vg:
+    system:
+      name: system
+      dev: "{{ disk }}3"
+      lv:
+        swap:
+          name: swap
+          size: 8g
+          fstype: swap
+          dev: /dev/mapper/system-swap
+        root:
+          name: root
+          size: +100%FREE
+          fstype: f2fs
+          dev: /dev/mapper/system-root
+    data:
+      name: data
+      dev: "{{ disk }}4"
+      lv:
+        home:
+          name: home
+          size: +100%FREE
+          fstype: f2fs
+          dev: /dev/mapper/data-home
