@@ -1,29 +1,22 @@
 # Partitioning
 - name: mklabel and create grub bios partition
-  command: "{{ item }}"
-  creates "{{ part.1.dev }}"
+  command: "{{ item }}" creates="{{ part.1.dev }}"
   with_items:
     - "parted -s {{ disk }} mklabel gpt"
-    - "parted -s {{ disk }} -- mkpart primary 1 {{ part.1.size }}"
-    - "parted -s {{ disk }} -- set 1 {{ part.1.type }} on"
+    - "parted -s {{ disk }} -- mkpart primary 1 {{ part.1.size }}; parted -s {{ disk }} -- set 1 {{ part.1.type }} on"
 
 - name: create boot partition
-  command: "parted -s {{ disk }} -- mkpart primary {{ part.1.size }} {{ part.2.size }}"
-  creates "{{ part.2.dev }}"
+  command: "parted -s {{ disk }} -- mkpart primary {{ part.1.size }} {{ part.2.size }}" creates="{{ part.2.dev }}"
 
 - name: create system disk
-  command: 
-  creates "{{ part.3.dev }}"
+  command: "{{ item }}" creates="{{ part.3.dev }}"
   with_items:
-    - "parted -s {{ disk }} -- mkpart primary {{ part.2.size }} {{ part.3.size }}"
-    - "parted -s {{ disk }} -- set 3 {{ part.3.type }} on"
+    - "parted -s {{ disk }} -- mkpart primary {{ part.2.size }} {{ part.3.size }}; parted -s {{ disk }} -- set 3 {{ part.3.type }} on"
 
 - name: create data disk
-  command: "{{ part.4.dev }}"
-  creates "{{ part.4.dev }}"
+  command: "{{ item }}" creates="{{ part.4.dev }}"
   with_items:
-    - "parted -s {{ disk }} -- mkpart primary {{ part.3.size }} {{ part.4.size }}"
-    - "parted -s {{ disk }} -- set 4 {{ part.4.type }} on"
+    - "parted -s {{ disk }} -- mkpart primary {{ part.3.size }} {{ part.4.size }}; parted -s {{ disk }} -- set 4 {{ part.4.type }} on"
 
 - name: create volume group system
   lvg:
