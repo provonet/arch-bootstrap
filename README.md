@@ -1,7 +1,9 @@
+
 Arch bootstrap
 =========
 
 Role to bootstrap an Arch linux installation
+
 
 Requirements
 ------------
@@ -10,9 +12,10 @@ This role assumes that you started the fresh box with the arch-boot iso
 
 You can tune the installation by overwriting the defauls the role variables in your're playbook. 
 
+
 Role Variables
 --------------
-<pre><code>
+```yaml
 hostname: NOTSET
 domain: NOTSET
 root_password: root
@@ -61,22 +64,23 @@ lvm:
           size: +100%FREE
           fstype: f2fs
           dev: /dev/mapper/data-home
-</code></pre>
+```
+
 
 Example Playbook
 ----------------
-<pre><code>
-- hosts: all
+```yaml
+-   hosts: all
 
-  vars:
-    hostname: archbox
-    domain: mydomain.org
-    root_password: secret
-    locale:
-      region: Europe
-      city: Amsterdam
+    vars:
+      hostname: archbox
+      domain: mydomain.org
+      root_password: secret
+      locale:
+        region: Europe
+        city: Amsterdam
 
-  pre_tasks:
+    pre_tasks:
     - name: clean roles directory
       local_action: file path=roles state=absent
 
@@ -85,13 +89,14 @@ Example Playbook
 
   roles:
     - arch-bootstrap
+```
 
-</code></pre>
 
 License
 -------
 
 BSD
+
 
 Author Information
 ------------------
