@@ -1,21 +1,8 @@
 ---
 # tasks file for bootstrap
-- stat: path=/tmp/partitioning_finished
-  register: partitioning
-  tags:
-  - disk
-
 - include: partitioning.yml
-  when: partitioning.stat.exists == False
   tags:
   - disk
-
-- file:
-    path: /tmp/partitioning_finished
-    state: touch
-  when: partitioning.stat.exists == False
-  tags:
-    - disk  
 
 - stat: path=/tmp/formating_finished
   register: formating
