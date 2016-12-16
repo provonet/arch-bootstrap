@@ -1,27 +1,41 @@
 # Partitioning
-- name: make partition label
-  command: "parted -s {{ disk }} mklabel gpt"
+- stat: path="{{ part.1.dev }}"
+  register: grub_bios
 
-- name: create grub bios partition
-  command: "parted -s {{ disk }} -- mkpart primary 1 {{ part.1.size }}"
+- stat: path="{{ part.2.dev }}"
+  register: boot
 
-- name: set grub bios
-  command: "parted -s {{ disk }} -- set 1 {{ part.1.type }} on"
+- stat: path="{{ part.3.dev }}"
+  register: system
+
+- stat: path="{{ part.4.dev }}"
+  register: data
+
+- name: mklabel and create grub bios partition
+  command: "{{ item }}"
+  when: grub_bios.stat.exists == False
+  with_items:
+    - "parted -s {{ disk }} mklabel gpt"
+    - "parted -s {{ disk }} -- mkpart primary 1 {{ part.1.size }}"
+    - "parted -s {{ disk }} -- set 1 {{ part.1.type }} on"
 
 - name: create boot partition
+  when: boot.stat.exists == False
   command: "parted -s {{ disk }} -- mkpart primary {{ part.1.size }} {{ part.2.size }}"
 
 - name: create system disk
-  command: "parted -s {{ disk }} -- mkpart primary {{ part.2.size }} {{ part.3.size }}"
-
-- name: set partition type
-  command: "parted -s {{ disk }} -- set 3 {{ part.3.type }} on"
+  command: "{{ item }}"
+  when: system.stat.exists == False
+  with_items:
+    - "parted -s {{ disk }} -- mkpart primary {{ part.2.size }} {{ part.3.size }}"
+    - "parted -s {{ disk }} -- set 3 {{ part.3.type }} on"
 
 - name: create data disk
-  command: "parted -s {{ disk }} -- mkpart primary {{ part.3.size }} {{ part.4.size }}"
-
-- name: set partition type
-  command: "parted -s {{ disk }} -- set 4 {{ part.4.type }} on"
+  command: "{{ item }}"
+  when: data.stat.exists == False
+  with_items:
+    - "parted -s {{ disk }} -- mkpart primary {{ part.3.size }} {{ part.4.size }}"
+    - "parted -s {{ disk }} -- set 4 {{ part.4.type }} on"
 
 - name: create volume group system
   lvg:

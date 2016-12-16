@@ -11,6 +11,7 @@ part:
   1:
     size: 2
     type: bios_grub
+    dev: "{{ disk }}1"
   2:
     size: 300MiB
     fstype: ext4

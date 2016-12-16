@@ -1,21 +1,8 @@
 ---
 # tasks file for bootstrap
-- stat: path=/tmp/partitioning_finished
-  register: partitioning
-  tags:
-  - disk
-
 - include: partitioning.yml
-  when: partitioning.stat.exists == False
   tags:
   - disk
-
-- file:
-    path: /tmp/partitioning_finished
-    state: touch
-  when: partitioning.stat.exists == False
-  tags:
-    - disk  
 
 - stat: path=/tmp/formating_finished
   register: formating
@@ -95,7 +82,7 @@
     - locale-gen
     - systemctl enable dhcpcd
     - systemctl enable sshd
-    - bash -c 'source /etc/profile; echo "root:{{ root_password }}" | /usr/sbin/chpasswd'
+    - bash -c 'source /etc/profile; echo "root:{{ root_password }}" | /usr/sbin/chpasswd -e'
     - bash -c 'echo "PermitRootLogin yes" >> /etc/ssh/sshd_config'
   when: chroot_install.stat.exists == False
   tags:
