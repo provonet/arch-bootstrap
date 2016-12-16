@@ -82,8 +82,14 @@
     - locale-gen
     - systemctl enable dhcpcd
     - systemctl enable sshd
-    - bash -c 'source /etc/profile; echo "root:{{ root_password }}" | /usr/sbin/chpasswd -e'
     - bash -c 'echo "PermitRootLogin yes" >> /etc/ssh/sshd_config'
+  when: chroot_install.stat.exists == False
+  tags:
+    - chroot
+
+- name: set root password
+  command: "bash -c 'source /etc/profile; echo root:{{ root_password }} | /usr/sbin/chpasswd -e'"
+  no_log: true
   when: chroot_install.stat.exists == False
   tags:
     - chroot
