@@ -5,12 +5,16 @@ Arch bootstrap
 Role to bootstrap an Arch linux installation
 
 
+
 Requirements
 ------------
+
 This role assumes that you started the fresh box with the arch-boot iso
 (https://www.archlinux.org/download/)
 
 You can tune the installation by overwriting the defauls the role variables in your're playbook. 
+
+
 
 
 Role Variables
@@ -92,10 +96,13 @@ Example Playbook
 ```
 
 
+
 License
 -------
 
 BSD
+
+
 
 
 Author Information
