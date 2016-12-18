@@ -88,7 +88,7 @@
     - chroot
 
 - name: set root password
-  command: "bash -c 'echo "root:{{ root_password }}"|/usr/sbin/chpasswd -e -R arch-chroot /mnt'"
+  command: "bash -c 'echo \"root:{{ root_password }}\"|/usr/sbin/chpasswd -e -R arch-chroot /mnt'"
   no_log: true
   when: chroot_install.stat.exists == False
   tags:
