@@ -1,3 +1,8 @@
+- stat: path=/mnt/etc/localtime
+  register: localtime
+  tags:
+  - chroot
+
 - name: run commands in chroot
   command: "arch-chroot /mnt {{ item }}"
   with_items:
@@ -8,8 +13,10 @@
     - locale-gen
     - systemctl enable dhcpcd
     - systemctl enable sshd
-    - bash -c 'echo "PermitRootLogin yes" >> /etc/ssh/sshd_config'
-  when: chroot_install.stat.exists == False
+    - bash -c 'echo "PermitRootLogin prohibit-password" >> /etc/ssh/sshd_config'
+  when:
+    - chroot.stat.exists
+    - localtime.stat.exists
   tags:
     - chroot
 
@@ -20,7 +27,7 @@
     mode: 0755
 
 - command: "/pwd.sh.tpl"
-  when: chroot_install.stat.exists == False
+  when: chroot.stat.exists
   tags:
     - chroot
 
