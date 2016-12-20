@@ -22,7 +22,7 @@
 
 - name: set root password
   template:
-    src: "{{ role_path }}/files/set_passwd.tpl"
+    src: "{{ role_path }}/templates/pwd.sh.tpl"
     dest: /pwd.sh
     mode: 0755
 
