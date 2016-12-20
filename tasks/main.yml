@@ -88,11 +88,19 @@
     - chroot
 
 - name: set root password
-  command: "bash -c 'echo \"root:{{ root_password }}\"|/usr/sbin/chpasswd -e -R arch-chroot /mnt'"
-  no_log: true
+  template:
+    src: "{{ playbook_dir }}/set_passwd.tpl"
+    dest: /pwd.sh
+    mode: 0755
+
+- command: "/pwd.sh.tpl"
   when: chroot_install.stat.exists == False
   tags:
     - chroot
+
+- file:
+    path: /pwd.sh
+    state: absent
 
 - name: unmount filesystems
   command: "umount {{ item }}"
