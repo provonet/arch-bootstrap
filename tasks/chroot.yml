@@ -26,7 +26,7 @@
     dest: /pwd.sh
     mode: 0755
 
-- command: "/pwd.sh.tpl"
+- command: "/pwd.sh"
   when: chroot.stat.exists
   tags:
     - chroot
