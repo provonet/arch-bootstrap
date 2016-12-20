@@ -16,7 +16,7 @@
     - bash -c 'echo "PermitRootLogin prohibit-password" >> /etc/ssh/sshd_config'
   when:
     - chroot.stat.exists
-    - localtime.stat.exists
+    - localtime.stat.exists == False
   tags:
     - chroot
 
