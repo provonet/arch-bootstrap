@@ -67,53 +67,21 @@
   tags:
   - configure
 
-- stat: path=/tmp/chroot_config_finished
-  register: chroot_install
+- stat: path=/mnt/etc
+  register: chroot
   tags:
     - chroot
 
-- name: run commands in chroot
-  command: "arch-chroot /mnt {{ item }}"
-  with_items:
-    - ln -s /usr/share/zoneinfo/{{ locale.region }}/{{ locale.city }} /etc/localtime
-    - grub-install --target=i386-pc "{{ disk }}"
-    - grub-mkconfig -o /boot/grub/grub.cfg
-    - mkinitcpio -p linux
-    - locale-gen
-    - systemctl enable dhcpcd
-    - systemctl enable sshd
-    - bash -c 'echo "PermitRootLogin yes" >> /etc/ssh/sshd_config'
-  when: chroot_install.stat.exists == False
+- include: chroot.yml
+  when: chroot.stat.exists
   tags:
-    - chroot
-
-- name: set root password
-  template:
-    src: "{{ playbook_dir }}/set_passwd.tpl"
-    dest: /pwd.sh
-    mode: 0755
-
-- command: "/pwd.sh.tpl"
-  when: chroot_install.stat.exists == False
-  tags:
-    - chroot
-
-- file:
-    path: /pwd.sh
-    state: absent
+  - configure
 
 - name: unmount filesystems
   command: "umount {{ item }}"
   with_items:
     - /mnt/boot
     - /mnt
-  when: chroot_install.stat.exists == False
-  tags:
-    - chroot
-
-- file:
-    path: /tmp/chroot_config_finished
-    state: touch
-  when: chroot_install.stat.exists == False
+  when: chroot.stat.exists
   tags:
     - chroot

@@ -1,0 +1,31 @@
+- name: run commands in chroot
+  command: "arch-chroot /mnt {{ item }}"
+  with_items:
+    - ln -s /usr/share/zoneinfo/{{ locale.region }}/{{ locale.city }} /etc/localtime
+    - grub-install --target=i386-pc "{{ disk }}"
+    - grub-mkconfig -o /boot/grub/grub.cfg
+    - mkinitcpio -p linux
+    - locale-gen
+    - systemctl enable dhcpcd
+    - systemctl enable sshd
+    - bash -c 'echo "PermitRootLogin yes" >> /etc/ssh/sshd_config'
+  when: chroot_install.stat.exists == False
+  tags:
+    - chroot
+
+- name: set root password
+  template:
+    src: "{{ role_path }}/files/set_passwd.tpl"
+    dest: /pwd.sh
+    mode: 0755
+
+- command: "/pwd.sh.tpl"
+  when: chroot_install.stat.exists == False
+  tags:
+    - chroot
+
+- file:
+    path: /pwd.sh
+    state: absent
+  tags:
+    - chroot
