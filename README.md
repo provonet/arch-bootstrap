@@ -6,6 +6,7 @@ Role to bootstrap an Arch linux installation
 
 
 
+
 Requirements
 ------------
 
@@ -74,26 +75,40 @@ lvm:
 Example Playbook
 ----------------
 ```yaml
--   hosts: all
+---
+- hosts: all
 
-    vars:
-      hostname: archbox
-      domain: mydomain.org
-      root_password: secret
-      locale:
-        region: Europe
-        city: Amsterdam
+  vars:
+    ansible_python_interpreter: /usr/bin/python2
+    hostname: myarchbox
+    domain: mydomain.net
+    locale:
+      region: Europe
+      city: Amsterdam
 
-    pre_tasks:
-    - name: clean roles directory
-      local_action: file path=roles state=absent
+  vars_prompt:
+    - name: "root_password"
+      prompt: "root password for the new installation"
+      private: yes
+      confirm: yes
+      encrypt: "sha512_crypt"
+      salt_size: 7
 
-    - name: run galaxy
-      local_action: command ansible-galaxy install -r requirements.yml --roles-path roles
+  pre_tasks:
+  - name: run galaxy
+    local_action: command ansible-galaxy install -r requirements.yml --roles-path roles --force
+    register: fetch_roles
 
-  roles:
-    - arch-bootstrap
+  tasks:
+  - include_role:
+      name: arch-bootstrap
+      static: no
+    ignore_errors: True
+    when:
+      - fetch_roles.changed
+
 ```
+
 
 
 
@@ -107,4 +122,4 @@ BSD
 
 Author Information
 ------------------
-12-12-2016: Johan Bakker
+20-12-2016: Johan Bakker
