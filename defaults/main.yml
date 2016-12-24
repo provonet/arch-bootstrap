@@ -49,3 +49,6 @@ lvm:
           size: +100%FREE
           fstype: f2fs
           dev: /dev/mapper/data-home
+ssh:
+  keyfile: ansible
+  passphrase: ''
