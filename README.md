@@ -15,9 +15,6 @@ This role assumes that you started the fresh box with the arch-boot iso
 
 You can tune the installation by overwriting the defauls the role variables in your're playbook. 
 
-
-
-
 Role Variables
 --------------
 ```yaml
@@ -69,6 +66,9 @@ lvm:
           size: +100%FREE
           fstype: f2fs
           dev: /dev/mapper/data-home
+ssh:
+  keyfile: ansible
+  passphrase: ''
 ```
 
 
@@ -122,4 +122,4 @@ BSD
 
 Author Information
 ------------------
-20-12-2016: Johan Bakker
+24-12-2016: Johan Bakker
