@@ -36,3 +36,25 @@
     state: absent
   tags:
     - chroot
+
+- local-action: command: "ssh-keygen -b 4096 -t rsa -f {{ role_path }}/files/ansible -q -N ''" creates={{ role_path }}/files/ansible.pub
+  when: chroot.stat.exists
+  register: keypair
+
+- file:
+    path: /mnt/root/.ssh
+    mode: 700
+  when: chroot.stat.exists
+  tags:
+    chroot
+
+- file:
+    src: {{ role_path }}/files/ansible.pub
+    dest: /mnt/root/.ssh/authorized_keys
+    state: present
+    mode: 600
+  when:
+    - chroot.stat.exists
+    - keypair.changed
+  tags:
+    - chroot
