@@ -6,7 +6,7 @@
 - name: run commands in chroot
   command: "arch-chroot /mnt {{ item }}"
   with_items:
-    - ln -s /usr/share/zoneinfo/{{ locale.region }}/{{ locale.city }} /etc/localtime
+    - ln -s /usr/share/zoneinfo/{{ timezone.region }}/{{ timezone.city }} /etc/localtime
     - grub-install --target=i386-pc "{{ disk }}"
     - grub-mkconfig -o /boot/grub/grub.cfg
     - mkinitcpio -p linux

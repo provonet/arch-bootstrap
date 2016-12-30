@@ -3,31 +3,28 @@
   template:
     src: "{{ role_path }}/templates/fstab.tpl"
     dest: /mnt/etc/fstab
-    mode: 0644
 
 - name: copy mkinitcpio.conf file
   copy:
     src: "{{ role_path }}/files/mkinitcpio.conf"
     dest: /mnt/etc/mkinitcpio.conf
 
-- name: copy locale.conf file
-  copy:
-    src: "{{ role_path }}/files/locale.conf"
+- name: enable locales
+  template:
+    src: "{{ role_path }}/templates/locale.gen.tpl"
+    dest: /mnt/etc/locale.gen
+
+- name: configure locale.conf file
+  template:
+    src: "{{ role_path }}/templates/locale.conf.tpl"
     dest: /mnt/etc/locale.conf
 
-- name: copy locale.conf file
-  copy:
-    src: "{{ role_path }}/files/locale.conf"
-    dest: /mnt/etc/locale.conf
-
-- name: configure hostfile
+- name: set hostname
   template:
     src: "{{ role_path }}/templates/hostname.tpl"
     dest: /mnt/etc/hostname
-    mode: 0644
 
 - name: configure hostfile
   template:
     src: "{{ role_path }}/templates/hosts.tpl"
     dest: /mnt/etc/hosts
-    mode: 0644
