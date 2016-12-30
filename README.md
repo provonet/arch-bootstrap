@@ -20,10 +20,18 @@ Role Variables
 ```yaml
 hostname: NOTSET
 domain: NOTSET
-root_password: root
-locale:
+root_password: NOSET
+timezone:
   region: Europe
   city: Amsterdam
+languages:
+  locales:
+    - locale: en_US.UTF-8
+      charset: UTF-8
+  default:
+    locale: en_US.UTF-8
+  ui:
+    locale: en_US.UTF-8
 disk: /dev/sda
 part:
   1:

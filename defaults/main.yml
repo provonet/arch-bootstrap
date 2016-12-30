@@ -2,7 +2,7 @@
 # defaults file for bootstrap
 hostname: NOTSET
 domain: NOTSET
-root_password: root
+root_password: NOTSET
 timezone:
   region: Europe
   city: Amsterdam
@@ -10,10 +10,8 @@ languages:
   locales:
     - locale: en_US.UTF-8
       charset: UTF-8
-    - locale: nl_NL.UTF-8
-      charset: UTF-8
   default:
-    locale: nl_NL.UTF-8
+    locale: en_US.UTF-8
   ui:
     locale: en_US.UTF-8
 
