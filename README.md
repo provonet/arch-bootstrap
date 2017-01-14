@@ -111,7 +111,6 @@ Example Playbook
   - include_role:
       name: arch-bootstrap
       static: no
-    ignore_errors: True
     when:
       - fetch_roles.changed
 
