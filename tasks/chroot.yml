@@ -1,7 +1,7 @@
 - stat: path=/mnt/boot/i386-pc
   register: grub
 
-- name: install kernel and grub generate locale in chroot
+- name: install kernel, grub and generate locale in chroot
   command: "arch-chroot /mnt {{ item }}"
   with_items:
     - mkinitcpio -p linux
