@@ -1,24 +1,32 @@
-- stat: path=/mnt/etc/localtime
-  register: localtime
-  tags:
-  - chroot
+- stat: path=/mnt/boot/i386-pc
+  register: grub
 
-- name: run commands in chroot
+- name: install kernel and grub generate locale in chroot
   command: "arch-chroot /mnt {{ item }}"
   with_items:
-    - ln -s /usr/share/zoneinfo/{{ timezone.region }}/{{ timezone.city }} /etc/localtime
+    - mkinitcpio -p linux
     - grub-install --target=i386-pc "{{ disk }}"
     - grub-mkconfig -o /boot/grub/grub.cfg
-    - mkinitcpio -p linux
     - locale-gen
-    - systemctl enable dhcpcd
-    - systemctl enable sshd
-    - bash -c 'echo "PermitRootLogin prohibit-password" >> /etc/ssh/sshd_config'
   when:
-    - chroot.stat.exists
-    - localtime.stat.exists == False
-  tags:
-    - chroot
+    - grub.stat.exists == False
+
+- name: configure timezone
+  file:
+    src: ../usr/share/zoneinfo/{{ timezone.region }}/{{ timezone.city }}
+    dest: /mnt/etc/localtime
+
+- name: enable dhcpcd
+  command: arch-chroot /mnt systemctl enable dhcpcd creates="/mnt/etc/system/multi-user.target.wants/dhcpcd.service"
+
+- name: enable sshd
+  command: arch-chroot /mnt systemctl enable sshd creates="/mnt/etc/system/multi-user.target.wants/sshd.service"
+
+- name: enable keylogin for root
+  replace:
+    dest: /mnt/etc/ssh/sshd_config
+    regexp: '(#PermitRootLogin\s+prohibit-password)'
+    replace: 'PermitRootLogin prohibit-password'
 
 - name: set root password
   template:
@@ -27,34 +35,20 @@
     mode: 0755
 
 - command: "/pwd.sh"
-  when: chroot.stat.exists
-  tags:
-    - chroot
 
 - file:
     path: /pwd.sh
     state: absent
-  tags:
-    - chroot
 
 - name: "generate keypair"
   local_action: command ssh-keygen -b 4096 -t rsa -f "{{ playbook_dir }}/{{ ssh.keyfile }}" -q -N "{{ ssh.passphrase }}" creates="{{ playbook_dir }}/{{ ssh.keyfile }}.pub"
-  tags:
-    chroot
 
 - file:
     path: /mnt/root/.ssh
     mode: 0700
     state: directory
-  when: chroot.stat.exists
-  tags:
-    chroot
 
 - copy:
     src: "{{ playbook_dir }}/{{ ssh.keyfile }}.pub"
     dest: /mnt/root/.ssh/authorized_keys
     mode: 0600
-  when:
-    - chroot.stat.exists
-  tags:
-    - chroot
