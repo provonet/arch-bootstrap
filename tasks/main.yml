@@ -46,7 +46,7 @@
     - configure
 
 - name: install base packages
-  command: pacstrap /mnt base f2fs-tools grub openssh python2
+  command: pacstrap /mnt base f2fs-tools xfsprogs util-linux grub openssh python2
   when: packages.stat.exists == False
   tags:
     - install

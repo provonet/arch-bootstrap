@@ -22,6 +22,9 @@
 - name: enable sshd
   command: arch-chroot /mnt systemctl enable sshd creates="/mnt/etc/system/multi-user.target.wants/sshd.service"
 
+- name: enable periodic trim of ssd
+  command: arch-chroot /mnt systemctl enable fstrim.timer creates="/mnt/etc/system/timers.target.wants/fstrim.timer"
+
 - name: enable keylogin for root
   replace:
     dest: /mnt/etc/ssh/sshd_config
