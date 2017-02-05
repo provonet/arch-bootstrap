@@ -9,6 +9,11 @@
     src: "{{ role_path }}/files/mkinitcpio.conf"
     dest: /mnt/etc/mkinitcpio.conf
 
+- name: copy mkinitcpio.conf file
+  copy:
+    src: "{{ role_path }}/files/60-schedulers.rules"
+    dest: /etc/udev/rules.d/60-schedulers.rules
+
 - name: enable locales
   template:
     src: "{{ role_path }}/templates/locale.gen.tpl"
