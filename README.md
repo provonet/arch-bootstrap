@@ -63,7 +63,7 @@ lvm:
         root:
           name: root
           size: +100%FREE
-          fstype: f2fs
+          fstype: xfs
           dev: /dev/mapper/system-root
     data:
       name: data
@@ -72,7 +72,7 @@ lvm:
         home:
           name: home
           size: +100%FREE
-          fstype: f2fs
+          fstype: xfs
           dev: /dev/mapper/data-home
 ssh:
   keyfile: ansible
