@@ -1,8 +1,4 @@
 # Format partitions
-- name: install f2fs-tools
-  pacman:
-    name: f2fs-tools
-
 - name: format boot
   command: "mkfs -t {{ part.2.fstype }} {{ part.2.dev }}"
 
