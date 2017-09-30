@@ -26,7 +26,7 @@ part:
     fstype: ext4
     dev: "{{ disk }}2"
   3:
-    size: 25GiB
+    size: 6GiB
     type: lvm
     dev: "{{ disk }}3"
   4:
@@ -41,7 +41,7 @@ lvm:
       lv:
         swap:
           name: swap
-          size: 8g
+          size: 512m
           fstype: swap
           dev: /dev/mapper/system-swap
         root:
